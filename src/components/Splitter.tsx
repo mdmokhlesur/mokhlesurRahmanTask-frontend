@@ -1,8 +1,10 @@
-import { LogOut, Save } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import Header from './Header';
 import type { ScreenNode, SplitType } from '../utils';
 import { generateId, getRandomColor, lightenColor } from '../utils';
+import './splitter.css';
 
 const Splitter: React.FC = () => {
   const [root, setRoot] = useState<ScreenNode>(() => ({
@@ -15,10 +17,10 @@ const Splitter: React.FC = () => {
 
   const [resizingId, setResizingId] = useState<string | null>(null);
   const [layoutId, setLayoutId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { logout, token } = useAuth();
 
-  // Load layout from backend on mount
   useEffect(() => {
     const fetchLayouts = async () => {
       try {
@@ -29,7 +31,6 @@ const Splitter: React.FC = () => {
         });
         const data = await response.json();
         if (data.success && data.data.length > 0) {
-          // Load the first saved layout
           const savedLayout = data.data[0];
           setRoot(savedLayout.structure);
           setLayoutId(savedLayout._id);
@@ -45,6 +46,7 @@ const Splitter: React.FC = () => {
   }, [token]);
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/layouts`, {
         method: 'POST',
@@ -59,13 +61,15 @@ const Splitter: React.FC = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Layout saved successfully!');
+        toast.success('Layout saved successfully!');
         setLayoutId(data.data._id);
       } else {
-        alert('Failed to save layout: ' + data.message);
+        toast.error('Failed to save layout: ' + data.message);
       }
     } catch (err) {
-      alert('Connection to backend failed');
+      toast.error('Connection to backend failed');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -171,31 +175,10 @@ const Splitter: React.FC = () => {
   }, [resizingId, handleMouseMove, handleMouseUp]);
 
   return (
-    <div ref={containerRef} className="w-screen h-screen overflow-hidden bg-white select-none flex flex-col">
-      {/* Top Bar */}
-      <div className="h-12 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 z-50">
-        <div className="text-white font-bold tracking-tight flex items-center gap-2">
-          <div className="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center text-[12px]">S</div>
-          Splitter
-        </div>
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={handleSave}
-            className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs font-medium transition-colors"
-          >
-            <Save size={14} /> Save
-          </button>
-          <div className="w-[1px] h-4 bg-slate-700 mx-1" />
-          <button 
-            onClick={logout}
-            className="flex items-center gap-1.5 text-slate-400 hover:text-red-400 text-xs font-medium transition-colors"
-          >
-            <LogOut size={14} /> Logout
-          </button>
-        </div>
-      </div>
+    <div ref={containerRef} className="splitter-container">
+      <Header onSave={handleSave} isSaving={isSaving} />
 
-      <div className="flex-1 relative overflow-hidden">
+      <div className="workspace">
         <Partition 
           node={root} 
           onSplit={splitNode} 
@@ -225,8 +208,8 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
     const isThisResizing = resizingId === node.id;
 
     return (
-      <div className={`flex w-full h-full ${direction} bg-white relative`}>
-        <div style={{ [isVertical ? 'width' : 'height']: `${node.ratio}%` }} className="overflow-hidden">
+      <div className={`partition-container ${direction}`}>
+        <div style={{ [isVertical ? 'width' : 'height']: `${node.ratio}%` }} className="partition-content">
           <Partition node={node.children[0]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
         </div>
         
@@ -234,18 +217,16 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
           id={`divider-${node.id}`}
           data-type={node.splitType}
           onMouseDown={() => onStartResize(node.id)}
-          className={`relative flex items-center justify-center bg-white hover:bg-indigo-400 transition-colors z-10
-            ${isVertical ? 'w-[4px] cursor-col-resize h-full' : 'h-[4px] cursor-row-resize w-full'}
-            ${isThisResizing ? 'bg-indigo-500' : ''}`}
+          className={`divider ${isVertical ? 'divider-v' : 'divider-h'} ${isThisResizing ? 'resizing' : ''}`}
         >
           {isThisResizing && (
-            <div className="absolute pointer-events-none bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded shadow-lg font-bold whitespace-nowrap z-50">
+            <div className="ratio-badge">
               {Math.round(node.ratio)}%
             </div>
           )}
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="partition-content flex-1">
           <Partition node={node.children[1]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
         </div>
       </div>
@@ -256,13 +237,13 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
 
   return (
     <div 
-      className="w-full h-full flex items-center justify-center relative group"
+      className="partition-leaf"
       style={{ backgroundColor: node.color }}
     >
-      <div className="flex gap-1.5 p-1 bg-black/5 rounded-md backdrop-blur-[2px] transition-opacity">
-        <button onClick={() => onSplit(node.id, 'v')} className="size-6 flex items-center justify-center hover:opacity-90 text-black text-[10px] font-bold border border-white/40 rounded shadow-sm bg-white/20" style={{ backgroundColor: buttonBg }}>V</button>
-        <button onClick={() => onSplit(node.id, 'h')} className="size-6 flex items-center justify-center hover:opacity-90 text-black text-[10px] font-bold border border-white/40 rounded shadow-sm bg-white/20" style={{ backgroundColor: buttonBg }}>H</button>
-        {!isRoot && <button onClick={() => onDelete(node.id)} className="size-6 flex items-center justify-center hover:opacity-90 text-black text-[10px] font-bold border border-white/40 rounded shadow-sm bg-white/20" style={{ backgroundColor: buttonBg }}>-</button>}
+      <div className="control-panel">
+        <button onClick={() => onSplit(node.id, 'v')} className="split-btn" style={{ backgroundColor: buttonBg }}>V</button>
+        <button onClick={() => onSplit(node.id, 'h')} className="split-btn" style={{ backgroundColor: buttonBg }}>H</button>
+        {!isRoot && <button onClick={() => onDelete(node.id)} className="split-btn" style={{ backgroundColor: buttonBg }}>-</button>}
       </div>
     </div>
   );

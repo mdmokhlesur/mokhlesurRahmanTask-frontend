@@ -7,9 +7,12 @@ import Register from './components/Register';
 import Splitter from './components/Splitter';
 import './index.css';
 
+import { Toaster } from 'react-hot-toast';
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
+      <Toaster position="top-right" reverseOrder={false} />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
