@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import Header from './Header';
 import type { ScreenNode, SplitType } from '../utils';
 import { generateId, getRandomColor, lightenColor } from '../utils';
+import Header from './Header';
 import './splitter.css';
 
 const Splitter: React.FC = () => {
@@ -16,10 +16,9 @@ const Splitter: React.FC = () => {
   }));
 
   const [resizingId, setResizingId] = useState<string | null>(null);
-  const [layoutId, setLayoutId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { logout, token } = useAuth();
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchLayouts = async () => {
@@ -33,7 +32,6 @@ const Splitter: React.FC = () => {
         if (data.success && data.data.length > 0) {
           const savedLayout = data.data[0];
           setRoot(savedLayout.structure);
-          setLayoutId(savedLayout._id);
         }
       } catch (err) {
         console.error('Failed to load layout:', err);
@@ -62,7 +60,6 @@ const Splitter: React.FC = () => {
       const data = await response.json();
       if (data.success) {
         toast.success('Layout saved successfully!');
-        setLayoutId(data.data._id);
       } else {
         toast.error('Failed to save layout: ' + data.message);
       }
