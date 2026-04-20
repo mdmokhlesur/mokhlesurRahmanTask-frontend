@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Save, Layout, User, ChevronDown } from 'lucide-react';
+import { LogOut, Layout, User, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './layout.css';
 

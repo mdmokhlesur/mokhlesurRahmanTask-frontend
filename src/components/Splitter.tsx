@@ -17,7 +17,6 @@ const Splitter: React.FC = () => {
   }));
 
   const [resizingId, setResizingId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInitialRender = useRef(true);
@@ -49,7 +48,6 @@ const Splitter: React.FC = () => {
   }, [token]);
 
   const handleSave = useCallback(async (signal?: AbortSignal) => {
-    setIsSaving(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/layouts`, {
         method: 'POST',
@@ -70,8 +68,6 @@ const Splitter: React.FC = () => {
     } catch (err: any) {
       if (err.name === 'AbortError') return;
       toast.error('Auto-save failed: connection error');
-    } finally {
-      setIsSaving(false);
     }
   }, [root, token]);
 
