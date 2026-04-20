@@ -24,6 +24,7 @@ const Header: React.FC<HeaderProps> = () => {
 
   return (
     <header className="h-16 px-6 flex items-center justify-between bg-white border-b border-slate-100 z-50 sticky top-0">
+      {/* Logo section */}
       <div className="flex items-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
@@ -32,15 +33,15 @@ const Header: React.FC<HeaderProps> = () => {
           <h1 className="text-lg font-bold text-slate-900 tracking-tight">Splitter</h1>
         </div>
       </div>
-
+{/* User Dropdown section */}
       <div className="flex items-center">
         {user && (
           <div className="relative" ref={dropdownRef}>
             <button 
-              className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl border border-slate-100 bg-slate-50 transition-all hover:bg-slate-100 ${showDropdown ? 'border-primary/30 ring-4 ring-primary/5' : ''}`}
+              className={`flex items-center gap-3 p-1.5 pr-4 rounded-md border border-slate-100 transition-all hover:bg-slate-100 ${showDropdown ? 'border-primary/30 ring-4 ring-primary/5' : ''}`}
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
+              <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center shadow-sm border border-slate-100">
                 <User size={16} className="text-primary" />
               </div>
               <span className="text-sm font-semibold text-slate-700 max-w-[150px] truncate">{user.email}</span>
@@ -48,28 +49,18 @@ const Header: React.FC<HeaderProps> = () => {
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 transform origin-top-right transition-all z-[100]">
-                <div className="px-4 py-3 border-b border-slate-50 mb-1">
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Signed in as</p>
-                  <p className="text-sm font-bold text-slate-900 truncate">{user.email}</p>
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-xl border border-slate-100 p-1 transform transition-all z-[100]">
+                <div className="px-4 py-2.5 border-b border-slate-50 mb-1">
+                  <p className="text-[10px] uppercase tracking-wider font-medium text-slate-400">Signed in as</p>
+                  <p className="text-sm font-semibold text-slate-900 truncate">{user.email}</p>
                 </div>
-                
-                <button className="flex items-center gap-3 w-full p-3 text-sm font-medium text-slate-600 rounded-xl transition-all hover:bg-slate-50 hover:text-primary">
-                  <User size={16} />
-                  <span>Profile Settings</span>
-                </button>
-                
-                <button className="flex items-center gap-3 w-full p-3 text-sm font-medium text-slate-600 rounded-xl transition-all hover:bg-slate-50 hover:text-primary">
-                  <Settings size={16} />
-                  <span>Preferences</span>
-                </button>
 
                 <button 
                   onClick={() => {
                     setShowDropdown(false);
                     logout();
                   }}
-                  className="flex items-center gap-3 w-full p-3 text-sm font-medium text-red-500 rounded-xl transition-all hover:bg-red-50"
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 rounded-md transition-all hover:bg-red-50"
                 >
                   <LogOut size={16} />
                   <span>Log Out</span>

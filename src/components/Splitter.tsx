@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import type { ScreenNode, SplitType } from '../utils';
-import { generateId, getRandomColor, lightenColor } from '../utils';
+import { generateId, getRandomColor } from '../utils';
 import Header from './Header';
 import Skeleton from './Skeleton';
+import Partition from './Partition';
 
-
-
+// Splitter main component
 const Splitter: React.FC = () => {
+  // Main layout state
   const [root, setRoot] = useState<ScreenNode>(() => ({
     id: generateId(),
     color: getRandomColor(),
@@ -23,6 +24,7 @@ const Splitter: React.FC = () => {
   const isInitialRender = useRef(true);
   const { token } = useAuth();
 
+  // Fetch initial layout from backend
   useEffect(() => {
     const fetchLayouts = async () => {
       try {
@@ -48,6 +50,7 @@ const Splitter: React.FC = () => {
     }
   }, [token]);
 
+  // Save layout logic
   const handleSave = useCallback(async (signal?: AbortSignal) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/layouts`, {
@@ -92,6 +95,7 @@ const Splitter: React.FC = () => {
     };
   }, [root, token, isLoading, handleSave]);
 
+  // Split operation
   const splitNode = useCallback((id: string, type: SplitType) => {
     const updateTree = (node: ScreenNode): ScreenNode => {
       if (node.id === id) {
@@ -113,6 +117,7 @@ const Splitter: React.FC = () => {
     setRoot(prev => updateTree(prev));
   }, []);
 
+  // Delete operation
   const deleteNode = useCallback((id: string) => {
     const removeFromTree = (node: ScreenNode): ScreenNode | null => {
       if (node.children) {
@@ -128,6 +133,7 @@ const Splitter: React.FC = () => {
     setRoot(prev => removeFromTree(prev) || prev);
   }, []);
 
+  // Update ratio and resizing logic
   const updateRatio = useCallback((id: string, newRatio: number, snap: boolean = false) => {
     let finalRatio = Math.max(5, Math.min(95, newRatio));
     
@@ -145,6 +151,7 @@ const Splitter: React.FC = () => {
     setRoot(prev => updateInTree(prev));
   }, []);
 
+  // Resizing logic
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!resizingId) return;
     const divider = document.getElementById(`divider-${resizingId}`);
@@ -197,6 +204,7 @@ const Splitter: React.FC = () => {
     return <Skeleton />;
   }
 
+  // Render workspace
   return (
     <div ref={containerRef} className="w-screen h-screen flex flex-col bg-white overflow-hidden select-none">
       <Header />
@@ -210,65 +218,6 @@ const Splitter: React.FC = () => {
           isRoot={root.children === null} 
           resizingId={resizingId}
         />
-      </div>
-    </div>
-  );
-};
-
-interface PartitionProps {
-  node: ScreenNode;
-  onSplit: (id: string, type: SplitType) => void;
-  onDelete: (id: string) => void;
-  onStartResize: (id: string) => void;
-  isRoot: boolean;
-  resizingId: string | null;
-}
-
-const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartResize, isRoot, resizingId }) => {
-  if (node.splitType && node.children) {
-    const isVertical = node.splitType === 'v';
-    const direction = isVertical ? 'flex-row' : 'flex-col';
-    const isThisResizing = resizingId === node.id;
-
-    return (
-      <div className={`w-full h-full flex overflow-hidden ${direction}`}>
-        <div style={{ [isVertical ? 'width' : 'height']: `${node.ratio}%` }} className="overflow-hidden">
-          <Partition node={node.children[0]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
-        </div>
-        
-        <div 
-          id={`divider-${node.id}`}
-          data-type={node.splitType}
-          onMouseDown={() => onStartResize(node.id)}
-          className={`relative flex items-center justify-center transition-colors duration-200 z-10 ${
-            isVertical ? 'w-1 cursor-col-resize h-full' : 'h-1 cursor-row-resize w-full'
-          } ${isThisResizing ? 'bg-primary' : 'bg-white hover:bg-primary/50'}`}
-        >
-          {isThisResizing && (
-            <div className="absolute bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-lg pointer-events-none whitespace-nowrap z-50">
-              {Math.round(node.ratio)}%
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-hidden">
-          <Partition node={node.children[1]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
-        </div>
-      </div>
-    );
-  }
-
-  const buttonBg = lightenColor(node.color, 20);
-
-  return (
-    <div 
-      className="w-full h-full flex items-center justify-center relative group"
-      style={{ backgroundColor: node.color }}
-    >
-      <div className="flex gap-2 p-1 bg-black/5 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <button onClick={() => onSplit(node.id, 'v')} className="w-8 h-8 flex items-center justify-center text-black/70 font-bold border border-white/40 rounded bg-white/20 hover:bg-white/40 transition-colors text-xs" style={{ backgroundColor: buttonBg }}>V</button>
-        <button onClick={() => onSplit(node.id, 'h')} className="w-8 h-8 flex items-center justify-center text-black/70 font-bold border border-white/40 rounded bg-white/20 hover:bg-white/40 transition-colors text-xs" style={{ backgroundColor: buttonBg }}>H</button>
-        {!isRoot && <button onClick={() => onDelete(node.id)} className="w-8 h-8 flex items-center justify-center text-black/70 font-bold border border-white/40 rounded bg-white/20 hover:bg-white/40 transition-colors text-xs" style={{ backgroundColor: buttonBg }}>-</button>}
       </div>
     </div>
   );
