@@ -50,7 +50,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-6">
+    <div className="min-h-screen flex items-center justify-center bg-primary/5 p-6">
       <div className="w-full max-w-[420px] bg-white rounded-lg shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)] p-8 border border-slate-100 transition-all duration-300">
         {/* Login page title */}
         <div className="mb-6">
