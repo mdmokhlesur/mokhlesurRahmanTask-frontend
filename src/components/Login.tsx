@@ -1,27 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Layout, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '../utils/validation';
+import type { LoginFormValues } from '../utils/validation';
 import './auth.css';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (values: LoginFormValues) => {
     setIsSubmitting(true);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(values),
       });
 
       const data = await response.json();
@@ -43,56 +52,41 @@ const Login: React.FC = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-icon-wrapper">
-            <div className="auth-icon-box">
-              <Layout className="text-white" size={32} />
-            </div>
-          </div>
-          <h2 className="auth-title">Sign In</h2>
-          <p className="auth-subtitle">Please enter your details to continue</p>
+          <h2 className="auth-title">Welcome back</h2>
+          <p className="auth-subtitle">Please enter your details to sign in</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label">Email</label>
             <div className="input-wrapper">
-              <div className="input-icon-left">
-                <Mail size={18} />
-              </div>
               <input 
                 type="email" 
-                required 
-                disabled={isSubmitting}
-                className="auth-input"
-                placeholder="name@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                className={`auth-input ${errors.email ? 'error' : ''}`}
+                placeholder="Email"
+                {...register('email')}
               />
+              {errors.email && <p className="error-message">{errors.email.message}</p>}
             </div>
           </div>
           
           <div className="form-group">
             <label className="form-label">Password</label>
             <div className="input-wrapper">
-              <div className="input-icon-left">
-                <Lock size={18} />
-              </div>
               <input 
                 type={showPassword ? 'text' : 'password'} 
-                required 
-                disabled={isSubmitting}
-                className="auth-input has-right-icon"
+                className={`auth-input has-right-icon ${errors.password ? 'error' : ''}`}
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register('password')}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="input-icon-right"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
+              {errors.password && <p className="error-message">{errors.password.message}</p>}
             </div>
           </div>
 

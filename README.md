@@ -6,7 +6,6 @@ This is the frontend portion of the Recursive Screen Splitter application, built
 - **React 19**: UI Framework
 - **Vite**: Build Tool & Dev Server
 - **Tailwind CSS**: Utility-first styling
-- **Framer Motion**: Smooth animations for splitting actions
 - **Lucide React**: Icon library
 - **React Hot Toast**: UI Notifications
 

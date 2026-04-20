@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Layout, User, ChevronDown } from 'lucide-react';
+import { LogOut, Layout, User, ChevronDown, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './layout.css';
 
@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = () => {
       <div className="header-left">
         <div className="header-logo">
           <div className="logo-box">
-            <Layout className="text-white" size={18} />
+            <Layout className="text-white" size={20} />
           </div>
           <h1 className="header-title">Splitter</h1>
         </div>
@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = () => {
               onClick={() => setShowDropdown(!showDropdown)}
             >
               <div className="user-avatar">
-                <User size={14} className="text-indigo-600" />
+                <User size={16} className="text-indigo-600" />
               </div>
               <span className="user-email">{user.email}</span>
               <ChevronDown size={14} className={`chevron ${showDropdown ? 'rotate' : ''}`} />
@@ -52,7 +52,17 @@ const Header: React.FC<HeaderProps> = () => {
                   <p className="dropdown-label">Signed in as</p>
                   <p className="dropdown-email">{user.email}</p>
                 </div>
-                <div className="dropdown-divider" />
+                
+                <button className="dropdown-item">
+                  <User size={16} />
+                  <span>Profile Settings</span>
+                </button>
+                
+                <button className="dropdown-item">
+                  <Settings size={16} />
+                  <span>Preferences</span>
+                </button>
+
                 <button 
                   onClick={() => {
                     setShowDropdown(false);
