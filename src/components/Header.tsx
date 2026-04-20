@@ -3,12 +3,9 @@ import { LogOut, Save, Layout, User, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './layout.css';
 
-interface HeaderProps {
-  onSave: () => void;
-  isSaving?: boolean;
-}
+interface HeaderProps {}
 
-const Header: React.FC<HeaderProps> = ({ onSave, isSaving }) => {
+const Header: React.FC<HeaderProps> = () => {
   const { logout, user } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,17 +33,6 @@ const Header: React.FC<HeaderProps> = ({ onSave, isSaving }) => {
       </div>
 
       <div className="header-right">
-        <button 
-          onClick={onSave}
-          disabled={isSaving}
-          className="btn-primary"
-        >
-          <Save size={16} />
-          {isSaving ? 'Saving...' : 'Save Layout'}
-        </button>
-
-        <div className="header-divider" />
-
         {user && (
           <div className="user-dropdown-container" ref={dropdownRef}>
             <button 

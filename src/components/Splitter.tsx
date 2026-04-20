@@ -20,6 +20,7 @@ const Splitter: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isInitialRender = useRef(true);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -47,11 +48,12 @@ const Splitter: React.FC = () => {
     }
   }, [token]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async (signal?: AbortSignal) => {
     setIsSaving(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/layouts`, {
         method: 'POST',
+        signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -62,17 +64,36 @@ const Splitter: React.FC = () => {
         })
       });
       const data = await response.json();
-      if (data.success) {
-        toast.success('Layout saved successfully!');
-      } else {
-        toast.error('Failed to save layout: ' + data.message);
+      if (!data.success) {
+        toast.error('Failed to auto-save: ' + data.message);
       }
-    } catch (err) {
-      toast.error('Connection to backend failed');
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      toast.error('Auto-save failed: connection error');
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [root, token]);
+
+  useEffect(() => {
+    if (isLoading || !token) return;
+
+    // Skip the very first render after loading to avoid saving the freshly fetched layout
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      handleSave(controller.signal);
+    }, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [root, token, isLoading, handleSave]);
 
   const splitNode = useCallback((id: string, type: SplitType) => {
     const updateTree = (node: ScreenNode): ScreenNode => {
@@ -181,7 +202,7 @@ const Splitter: React.FC = () => {
 
   return (
     <div ref={containerRef} className="splitter-container">
-      <Header onSave={handleSave} isSaving={isSaving} />
+      <Header />
 
       <div className="workspace">
         <Partition 
