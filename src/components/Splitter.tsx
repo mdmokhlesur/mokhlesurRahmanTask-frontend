@@ -5,7 +5,8 @@ import type { ScreenNode, SplitType } from '../utils';
 import { generateId, getRandomColor, lightenColor } from '../utils';
 import Header from './Header';
 import Skeleton from './Skeleton';
-import './splitter.css';
+
+
 
 const Splitter: React.FC = () => {
   const [root, setRoot] = useState<ScreenNode>(() => ({
@@ -197,10 +198,10 @@ const Splitter: React.FC = () => {
   }
 
   return (
-    <div ref={containerRef} className="splitter-container">
+    <div ref={containerRef} className="w-screen h-screen flex flex-col bg-white overflow-hidden select-none">
       <Header />
 
-      <div className="workspace">
+      <div className="flex-1 relative overflow-hidden">
         <Partition 
           node={root} 
           onSplit={splitNode} 
@@ -230,8 +231,8 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
     const isThisResizing = resizingId === node.id;
 
     return (
-      <div className={`partition-container ${direction}`}>
-        <div style={{ [isVertical ? 'width' : 'height']: `${node.ratio}%` }} className="partition-content">
+      <div className={`w-full h-full flex overflow-hidden ${direction}`}>
+        <div style={{ [isVertical ? 'width' : 'height']: `${node.ratio}%` }} className="overflow-hidden">
           <Partition node={node.children[0]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
         </div>
         
@@ -239,16 +240,18 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
           id={`divider-${node.id}`}
           data-type={node.splitType}
           onMouseDown={() => onStartResize(node.id)}
-          className={`divider ${isVertical ? 'divider-v' : 'divider-h'} ${isThisResizing ? 'resizing' : ''}`}
+          className={`relative flex items-center justify-center transition-colors duration-200 z-10 ${
+            isVertical ? 'w-1 cursor-col-resize h-full' : 'h-1 cursor-row-resize w-full'
+          } ${isThisResizing ? 'bg-primary' : 'bg-white hover:bg-primary/50'}`}
         >
           {isThisResizing && (
-            <div className="ratio-badge">
+            <div className="absolute bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-lg pointer-events-none whitespace-nowrap z-50">
               {Math.round(node.ratio)}%
             </div>
           )}
         </div>
 
-        <div className="partition-content flex-1">
+        <div className="flex-1 overflow-hidden">
           <Partition node={node.children[1]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
         </div>
       </div>
@@ -259,13 +262,13 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
 
   return (
     <div 
-      className="partition-leaf"
+      className="w-full h-full flex items-center justify-center relative group"
       style={{ backgroundColor: node.color }}
     >
-      <div className="control-panel">
-        <button onClick={() => onSplit(node.id, 'v')} className="split-btn" style={{ backgroundColor: buttonBg }}>V</button>
-        <button onClick={() => onSplit(node.id, 'h')} className="split-btn" style={{ backgroundColor: buttonBg }}>H</button>
-        {!isRoot && <button onClick={() => onDelete(node.id)} className="split-btn" style={{ backgroundColor: buttonBg }}>-</button>}
+      <div className="flex gap-2 p-1 bg-black/5 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <button onClick={() => onSplit(node.id, 'v')} className="w-8 h-8 flex items-center justify-center text-black/70 font-bold border border-white/40 rounded bg-white/20 hover:bg-white/40 transition-colors text-xs" style={{ backgroundColor: buttonBg }}>V</button>
+        <button onClick={() => onSplit(node.id, 'h')} className="w-8 h-8 flex items-center justify-center text-black/70 font-bold border border-white/40 rounded bg-white/20 hover:bg-white/40 transition-colors text-xs" style={{ backgroundColor: buttonBg }}>H</button>
+        {!isRoot && <button onClick={() => onDelete(node.id)} className="w-8 h-8 flex items-center justify-center text-black/70 font-bold border border-white/40 rounded bg-white/20 hover:bg-white/40 transition-colors text-xs" style={{ backgroundColor: buttonBg }}>-</button>}
       </div>
     </div>
   );

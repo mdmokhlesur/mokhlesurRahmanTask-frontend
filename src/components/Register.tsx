@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema } from '../utils/validation';
 import type { RegisterFormValues } from '../utils/validation';
-import './auth.css';
+
+
 
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -52,99 +53,100 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card wide">
-        <div className="auth-header">
-          <h2 className="auth-title">Create an account</h2>
-          <p className="auth-subtitle">
-            Already have an account? <Link to="/login" className="auth-link">Log in</Link>
+    <div className="min-h-screen flex items-center justify-center bg-white p-6">
+      <div className="w-full max-w-[500px] bg-white rounded-3xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)] p-10 border border-slate-100 transition-all duration-300">
+        <div className="text-center mb-10">
+          <h2 className="text-[2rem] font-bold text-slate-900 tracking-tight mb-3">Create an account</h2>
+          <p className="text-sm text-slate-500 font-medium">
+            Already have an account? <Link to="/login" className="text-primary font-semibold no-underline ml-1 hover:underline">Log in</Link>
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">First name</label>
-              <div className="input-wrapper">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">First name</label>
+              <div className="relative">
                 <input 
                   type="text" 
-                  className={`auth-input ${errors.firstName ? 'error' : ''}`}
+                  className={`w-full px-4 py-3.5 rounded-xl border ${errors.firstName ? 'border-red-500' : 'border-slate-200'} outline-none transition-all duration-200 bg-slate-50 text-slate-900 text-[15px] placeholder-slate-400 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10`}
                   placeholder="Fletcher"
                   {...register('firstName')}
                 />
-                {errors.firstName && <p className="error-message">{errors.firstName.message}</p>}
+                {errors.firstName && <p className="text-xs text-red-500 mt-1 font-medium">{errors.firstName.message}</p>}
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Last name</label>
-              <div className="input-wrapper">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Last name</label>
+              <div className="relative">
                 <input 
                   type="text" 
-                  className={`auth-input ${errors.lastName ? 'error' : ''}`}
+                  className={`w-full px-4 py-3.5 rounded-xl border ${errors.lastName ? 'border-red-500' : 'border-slate-200'} outline-none transition-all duration-200 bg-slate-50 text-slate-900 text-[15px] placeholder-slate-400 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10`}
                   placeholder="Last name"
                   {...register('lastName')}
                 />
-                {errors.lastName && <p className="error-message">{errors.lastName.message}</p>}
+                {errors.lastName && <p className="text-xs text-red-500 mt-1 font-medium">{errors.lastName.message}</p>}
               </div>
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <div className="input-wrapper">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Email</label>
+            <div className="relative">
               <input 
                 type="email" 
-                className={`auth-input ${errors.email ? 'error' : ''}`}
+                className={`w-full px-4 py-3.5 rounded-xl border ${errors.email ? 'border-red-500' : 'border-slate-200'} outline-none transition-all duration-200 bg-slate-50 text-slate-900 text-[15px] placeholder-slate-400 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10`}
                 placeholder="Email"
                 {...register('email')}
               />
-              {errors.email && <p className="error-message">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email.message}</p>}
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Enter your password</label>
-            <div className="input-wrapper">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Enter your password</label>
+            <div className="relative">
               <input 
                 type={showPassword ? 'text' : 'password'} 
-                className={`auth-input has-right-icon ${errors.password ? 'error' : ''}`}
+                className={`w-full px-4 py-3.5 pr-12 rounded-xl border ${errors.password ? 'border-red-500' : 'border-slate-200'} outline-none transition-all duration-200 bg-slate-50 text-slate-900 text-[15px] placeholder-slate-400 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10`}
                 placeholder="Enter your password"
                 {...register('password')}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="input-icon-right"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 flex items-center bg-none border-none cursor-pointer p-0 transition-colors duration-200 hover:text-primary"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
-              {errors.password && <p className="error-message">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-red-500 mt-1 font-medium">{errors.password.message}</p>}
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="checkbox-group">
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-3 cursor-pointer">
               <input 
                 type="checkbox" 
-                className="auth-checkbox"
+                className="w-5 h-5 rounded border-slate-200 cursor-pointer accent-primary"
                 {...register('agreeToTerms')}
               />
-              <span className="checkbox-label">I agree to the Terms & Conditions</span>
+              <span className="text-sm text-slate-500 select-none">I agree to the Terms & Conditions</span>
             </label>
-            {errors.agreeToTerms && <p className="error-message">{errors.agreeToTerms.message}</p>}
+            {errors.agreeToTerms && <p className="text-xs text-red-500 mt-1 font-medium">{errors.agreeToTerms.message}</p>}
           </div>
 
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="auth-button"
+            className="w-full bg-primary text-white font-semibold py-3.5 rounded-xl border-none cursor-pointer transition-all duration-200 text-base mt-4 enabled:hover:bg-primary-dark enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg enabled:hover:shadow-primary/25 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Creating account...' : 'Create account'}
           </button>
         </form>
       </div>
     </div>
+
   );
 };
 
