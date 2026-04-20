@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import type { ScreenNode, SplitType } from '../utils';
 import { generateId, getRandomColor, lightenColor } from '../utils';
 import Header from './Header';
+import Skeleton from './Skeleton';
 import './splitter.css';
 
 const Splitter: React.FC = () => {
@@ -17,6 +18,7 @@ const Splitter: React.FC = () => {
 
   const [resizingId, setResizingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const { token } = useAuth();
 
@@ -39,7 +41,9 @@ const Splitter: React.FC = () => {
     };
 
     if (token) {
-      fetchLayouts();
+      fetchLayouts().finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
   }, [token]);
 
@@ -170,6 +174,10 @@ const Splitter: React.FC = () => {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [resizingId, handleMouseMove, handleMouseUp]);
+
+  if (isLoading) {
+    return <Skeleton />;
+  }
 
   return (
     <div ref={containerRef} className="splitter-container">
