@@ -1,6 +1,5 @@
 import React from 'react';
 import type { ScreenNode, SplitType } from '../utils';
-import { lightenColor } from '../utils';
 
 export interface PartitionProps {
   node: ScreenNode;
@@ -44,9 +43,7 @@ const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartR
         </div>
       </div>
     );
-  }
-
-  const buttonBg = lightenColor(node.color, 20);
+  } 
 
   return (
     <div 

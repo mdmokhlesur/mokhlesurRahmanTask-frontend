@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Layout, User, ChevronDown, Settings } from 'lucide-react';
+import { LogOut, Layout, User, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 
 
-interface HeaderProps {}
-
-const Header: React.FC<HeaderProps> = () => {
+const Header: React.FC = () => {
   const { logout, user } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
