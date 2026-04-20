@@ -2,12 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import type { ScreenNode, SplitType } from '../utils';
-import { generateId, getRandomColor, lightenColor } from '../utils';
+import { generateId, getRandomColor } from '../utils';
 import Header from './Header';
 import Skeleton from './Skeleton';
-import './splitter.css';
+import Partition from './Partition';
 
+// Splitter main component
 const Splitter: React.FC = () => {
+  // Main layout state
   const [root, setRoot] = useState<ScreenNode>(() => ({
     id: generateId(),
     color: getRandomColor(),
@@ -22,6 +24,7 @@ const Splitter: React.FC = () => {
   const isInitialRender = useRef(true);
   const { token } = useAuth();
 
+  // Fetch initial layout from backend
   useEffect(() => {
     const fetchLayouts = async () => {
       try {
@@ -47,6 +50,7 @@ const Splitter: React.FC = () => {
     }
   }, [token]);
 
+  // Save layout logic
   const handleSave = useCallback(async (signal?: AbortSignal) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/layouts`, {
@@ -91,6 +95,7 @@ const Splitter: React.FC = () => {
     };
   }, [root, token, isLoading, handleSave]);
 
+  // Split operation
   const splitNode = useCallback((id: string, type: SplitType) => {
     const updateTree = (node: ScreenNode): ScreenNode => {
       if (node.id === id) {
@@ -112,6 +117,7 @@ const Splitter: React.FC = () => {
     setRoot(prev => updateTree(prev));
   }, []);
 
+  // Delete operation
   const deleteNode = useCallback((id: string) => {
     const removeFromTree = (node: ScreenNode): ScreenNode | null => {
       if (node.children) {
@@ -127,6 +133,7 @@ const Splitter: React.FC = () => {
     setRoot(prev => removeFromTree(prev) || prev);
   }, []);
 
+  // Update ratio and resizing logic
   const updateRatio = useCallback((id: string, newRatio: number, snap: boolean = false) => {
     let finalRatio = Math.max(5, Math.min(95, newRatio));
     
@@ -144,6 +151,7 @@ const Splitter: React.FC = () => {
     setRoot(prev => updateInTree(prev));
   }, []);
 
+  // Resizing logic
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!resizingId) return;
     const divider = document.getElementById(`divider-${resizingId}`);
@@ -196,11 +204,12 @@ const Splitter: React.FC = () => {
     return <Skeleton />;
   }
 
+  // Render workspace
   return (
-    <div ref={containerRef} className="splitter-container">
+    <div ref={containerRef} className="w-screen h-screen flex flex-col bg-white overflow-hidden select-none">
       <Header />
 
-      <div className="workspace">
+      <div className="flex-1 relative overflow-hidden">
         <Partition 
           node={root} 
           onSplit={splitNode} 
@@ -209,63 +218,6 @@ const Splitter: React.FC = () => {
           isRoot={root.children === null} 
           resizingId={resizingId}
         />
-      </div>
-    </div>
-  );
-};
-
-interface PartitionProps {
-  node: ScreenNode;
-  onSplit: (id: string, type: SplitType) => void;
-  onDelete: (id: string) => void;
-  onStartResize: (id: string) => void;
-  isRoot: boolean;
-  resizingId: string | null;
-}
-
-const Partition: React.FC<PartitionProps> = ({ node, onSplit, onDelete, onStartResize, isRoot, resizingId }) => {
-  if (node.splitType && node.children) {
-    const isVertical = node.splitType === 'v';
-    const direction = isVertical ? 'flex-row' : 'flex-col';
-    const isThisResizing = resizingId === node.id;
-
-    return (
-      <div className={`partition-container ${direction}`}>
-        <div style={{ [isVertical ? 'width' : 'height']: `${node.ratio}%` }} className="partition-content">
-          <Partition node={node.children[0]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
-        </div>
-        
-        <div 
-          id={`divider-${node.id}`}
-          data-type={node.splitType}
-          onMouseDown={() => onStartResize(node.id)}
-          className={`divider ${isVertical ? 'divider-v' : 'divider-h'} ${isThisResizing ? 'resizing' : ''}`}
-        >
-          {isThisResizing && (
-            <div className="ratio-badge">
-              {Math.round(node.ratio)}%
-            </div>
-          )}
-        </div>
-
-        <div className="partition-content flex-1">
-          <Partition node={node.children[1]} onSplit={onSplit} onDelete={onDelete} onStartResize={onStartResize} isRoot={false} resizingId={resizingId} />
-        </div>
-      </div>
-    );
-  }
-
-  const buttonBg = lightenColor(node.color, 20);
-
-  return (
-    <div 
-      className="partition-leaf"
-      style={{ backgroundColor: node.color }}
-    >
-      <div className="control-panel">
-        <button onClick={() => onSplit(node.id, 'v')} className="split-btn" style={{ backgroundColor: buttonBg }}>V</button>
-        <button onClick={() => onSplit(node.id, 'h')} className="split-btn" style={{ backgroundColor: buttonBg }}>H</button>
-        {!isRoot && <button onClick={() => onDelete(node.id)} className="split-btn" style={{ backgroundColor: buttonBg }}>-</button>}
       </div>
     </div>
   );

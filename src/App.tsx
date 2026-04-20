@@ -5,7 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
 import Register from './components/Register';
 import Splitter from './components/Splitter';
-import './index.css';
+
+
 
 import { Toaster } from 'react-hot-toast';
 
