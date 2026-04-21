@@ -22,13 +22,14 @@ This is the frontend portion of the Recursive Screen Splitter application, built
    cp .env.example .env
    ```
    *Default:* `VITE_API_URL=http://localhost:5000/api/v1`
+   *Deployment:*`VITE_API_URL=VITE_API_URL=https://mokhlesur-rahman-task-backend.vercel.app/api/v1`
 
-3. **Run Development Server**:
+4. **Run Development Server**:
    ```bash
    npm run dev
    ```
 
-4. **Build for Production**:
+5. **Build for Production**:
    ```bash
    npm run build
    ```
