@@ -1,14 +1,16 @@
-import type { ScreenNode, SplitType } from '../types/layout';
-import { generateId, getRandomColor } from '../utils';
+import type { ScreenNode, SplitType } from "../types/layout";
+import { generateId, getRandomColor } from "../utils";
 
 /* Find a node by ID in the tree.*/
 export const findNodeById = (
   node: ScreenNode,
-  id: string
+  id: string,
 ): ScreenNode | null => {
   if (node.id === id) return node;
   if (node.children) {
-    return findNodeById(node.children[0], id) || findNodeById(node.children[1], id);
+    return (
+      findNodeById(node.children[0], id) || findNodeById(node.children[1], id)
+    );
   }
   return null;
 };
@@ -17,7 +19,7 @@ export const findNodeById = (
 export const updateNodeById = (
   node: ScreenNode,
   id: string,
-  updater: (node: ScreenNode) => ScreenNode
+  updater: (node: ScreenNode) => ScreenNode,
 ): ScreenNode => {
   if (node.id === id) return updater(node);
   if (node.children) {
@@ -35,7 +37,7 @@ export const updateNodeById = (
 /* Remove a node by ID from the tree.*/
 export const removeNodeById = (
   node: ScreenNode,
-  id: string
+  id: string,
 ): ScreenNode | null => {
   if (node.children) {
     const [c1, c2] = node.children;
@@ -56,24 +58,36 @@ export const removeNodeById = (
 export const splitNodeById = (
   node: ScreenNode,
   id: string,
-  type: SplitType
+  type: SplitType,
 ): ScreenNode => {
   return updateNodeById(node, id, (target) => ({
     ...target,
     splitType: type,
     ratio: 50,
     children: [
-      { id: generateId(), color: target.color, splitType: null, ratio: 50, children: null },
-      { id: generateId(), color: getRandomColor(), splitType: null, ratio: 50, children: null },
+      {
+        id: generateId(),
+        color: target.color,
+        splitType: null,
+        ratio: 50,
+        children: null,
+      },
+      {
+        id: generateId(),
+        color: getRandomColor(),
+        splitType: null,
+        ratio: 50,
+        children: null,
+      },
     ],
   }));
 };
 
 /* Snap a ratio value to the nearest 25/50/75 if within 5% threshold.*/
 export const snapRatio = (ratio: number): number => {
-  if (Math.abs(ratio - 25) < 5) return 25;
-  if (Math.abs(ratio - 50) < 5) return 50;
-  if (Math.abs(ratio - 75) < 5) return 75;
+  if (Math.abs(ratio - 25) < 15) return 25;
+  if (Math.abs(ratio - 50) < 15) return 50;
+  if (Math.abs(ratio - 75) < 15) return 75;
   return ratio;
 };
 
