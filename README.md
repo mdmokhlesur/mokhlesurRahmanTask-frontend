@@ -18,12 +18,14 @@ This is the frontend portion of the Recursive Screen Splitter application, built
 
 2. **Environment Variables**:
    Copy `.env.example` to `.env` and configure the backend URL:
+   ***Default***
    ```bash
-   cp .env.example .env
+   VITE_API_URL=http://localhost:5000/api/v1
    ```
-   - *Default:* `VITE_API_URL=http://localhost:5000/api/v1`
-   - *Deployment:*`VITE_API_URL=VITE_API_URL=https://mokhlesur-rahman-task-backend.vercel.app/api/v1`
-
+   ***Deployed***
+   ```bash
+   VITE_API_URL=VITE_API_URL=https://mokhlesur-rahman-task-backend.vercel.app/api/v1
+   ```
 4. **Run Development Server**:
    ```bash
    npm run dev
