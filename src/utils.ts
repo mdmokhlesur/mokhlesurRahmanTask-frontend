@@ -1,3 +1,5 @@
+export type { ScreenNode, SplitType } from './types/layout';
+
 export const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -8,16 +10,6 @@ export const getRandomColor = () => {
 };
 
 export const generateId = () => Math.random().toString(36).substr(2, 9);
-
-export type SplitType = 'v' | 'h' | null;
-
-export interface ScreenNode {
-  id: string;
-  color: string;
-  splitType: SplitType;
-  ratio: number; // Percentage for the first child (0-100)
-  children: [ScreenNode, ScreenNode] | null;
-}
 
 export const lightenColor = (hex: string, percent: number) => {
   const num = parseInt(hex.replace('#', ''), 16);
