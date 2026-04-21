@@ -85,9 +85,9 @@ export const splitNodeById = (
 
 /* Snap a ratio value to the nearest 25/50/75 if within 5% threshold.*/
 export const snapRatio = (ratio: number): number => {
-  if (Math.abs(ratio - 25) < 15) return 25;
-  if (Math.abs(ratio - 50) < 15) return 50;
-  if (Math.abs(ratio - 75) < 15) return 75;
+  if (Math.abs(ratio - 25) < 10) return 25;
+  if (Math.abs(ratio - 50) < 10) return 50;
+  if (Math.abs(ratio - 75) < 10) return 75;
   return ratio;
 };
 
