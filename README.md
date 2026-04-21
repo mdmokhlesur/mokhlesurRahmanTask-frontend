@@ -17,7 +17,7 @@ This is the frontend portion of the Recursive Screen Splitter application, built
    ```
 
 2. **Environment Variables**:
-   Copy `.env.example` to `.env` and configure the backend URL:
+   `.env` and configure the backend URL:
    
    - ***Default***
    ```bash
