@@ -3,8 +3,8 @@
 @config "../tailwind.config.js";
 
 @theme {
-  --color-primary: #1F51FF;
-  --color-primary-dark: #0F52BA;
+  --color-primary: #1F6F5F;
+  --color-primary-dark: #2FA084;
 }
 
 @layer base {
